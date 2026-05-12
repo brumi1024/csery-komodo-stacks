@@ -15,10 +15,9 @@ tags = [
 ]
 [stack.config]
 server = "Local"
-linked_repo = "csery-komodo-stacks"
-skip_secret_interp = false
 poll_for_updates = true
 auto_update = true
+linked_repo = "csery-komodo-stacks"
 run_directory = "services/caddy"
 file_paths = ["docker-compose.yaml"]
 config_files = [
@@ -210,17 +209,17 @@ is_secret = false
 ##
 
 [[variable]]
-name = "PORT_NEXTCLOUD_HTTP"
-description = "Legacy Nextcloud host HTTP port"
-value = "8082"
+name = "PORT_KOMODO_HTTP"
+description = "Komodo port"
+value = "9120"
 is_secret = false
 
 ##
 
 [[variable]]
-name = "PORT_PORTAINER_HTTP"
-description = "Legacy Portainer host HTTP port"
-value = "9000"
+name = "PORT_NEXTCLOUD_HTTP"
+description = "Legacy Nextcloud host HTTP port"
+value = "8082"
 is_secret = false
 
 ##
