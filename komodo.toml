@@ -16,6 +16,7 @@ tags = [
 [stack.config]
 server = "Local"
 linked_repo = "csery-komodo-stacks"
+skip_secret_interp = false
 poll_for_updates = true
 auto_update = true
 run_directory = "services/caddy"
