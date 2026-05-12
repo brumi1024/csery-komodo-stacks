@@ -34,8 +34,8 @@ stacks. Deploy and redeploy through Komodo.
 
 1. Create or confirm the Komodo server target named `docker`.
 2. Provide `CADDY_DUCKDNS_TOKEN` and `DUCKDNS_SUBDOMAIN` as Komodo Core
-   secrets, for example with `KOMODO_SECRETS__CADDY_DUCKDNS_TOKEN` and
-   `KOMODO_SECRETS__DUCKDNS_SUBDOMAIN` on the Core container.
+   secrets in the Core config file. Do not use Resource Sync variables for
+   these values.
 3. Create a Resource Sync pointing at this repo and `komodo.toml`.
 4. Enable Managed Mode on the Resource Sync if Komodo UI edits should commit
    back to this file.
@@ -114,6 +114,16 @@ these values must match the ports already exposed on `csery-nas`.
 Keep secret values out of Git and out of Resource Sync-managed variables. Add
 new stack secrets as Komodo Core secrets and reference them from `komodo.toml`
 with `[[SECRET_NAME]]` placeholders.
+
+Core secrets must be configured in Komodo Core config, not with arbitrary
+`KOMODO_SECRETS__...` environment variables. Mount a config file to
+`/config/config.toml` in the Core container and include:
+
+```toml
+[secrets]
+CADDY_DUCKDNS_TOKEN = "..."
+DUCKDNS_SUBDOMAIN = "..."
+```
 
 ## Stack Layout
 

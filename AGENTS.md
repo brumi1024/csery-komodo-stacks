@@ -9,6 +9,8 @@ for Resource Sync Managed Mode.
 - Keep secret values out of Git.
 - Reference secrets in `komodo.toml` with generic Komodo secret placeholders.
 - Do not define secrets as Resource Sync `[[variable]]` entries.
+- Do not document arbitrary `KOMODO_SECRETS__...` environment variables; use
+  Core config `[secrets]` mounted at `/config/config.toml`.
 - The Caddy DuckDNS token and subdomain are expected as
   `[[CADDY_DUCKDNS_TOKEN]]` and `[[DUCKDNS_SUBDOMAIN]]`.
 
