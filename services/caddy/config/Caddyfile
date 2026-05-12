@@ -1,0 +1,51 @@
+{
+	email {$ACME_EMAIL}
+
+	admin 0.0.0.0:{$PORT_CADDY_ADMIN}
+
+	dynamic_dns {
+		provider duckdns {$DUCKDNS_TOKEN}
+		domains {
+			{$DUCKDNS_ZONE} {$DUCKDNS_SUBDOMAIN}
+		}
+		versions ipv4
+		check_interval 5m
+	}
+}
+
+(common) {
+	encode zstd gzip
+	log {
+		output file /var/log/caddy/access.log
+	}
+}
+
+heimdall.{$DUCKDNS_SUBDOMAIN}.{$DUCKDNS_ZONE} {
+	import common
+	reverse_proxy {$CADDY_HOST_ALIAS}:{$PORT_HEIMDALL_HTTP}
+}
+
+nextcloud.{$DUCKDNS_SUBDOMAIN}.{$DUCKDNS_ZONE} {
+	import common
+	reverse_proxy {$CADDY_HOST_ALIAS}:{$PORT_NEXTCLOUD_HTTP}
+}
+
+sonarr.{$DUCKDNS_SUBDOMAIN}.{$DUCKDNS_ZONE} {
+	import common
+	reverse_proxy {$CADDY_HOST_ALIAS}:{$PORT_SONARR_HTTP}
+}
+
+qbittorrent.{$DUCKDNS_SUBDOMAIN}.{$DUCKDNS_ZONE} {
+	import common
+	reverse_proxy {$CADDY_HOST_ALIAS}:{$PORT_QBITTORRENT_HTTP}
+}
+
+radarr.{$DUCKDNS_SUBDOMAIN}.{$DUCKDNS_ZONE} {
+	import common
+	reverse_proxy {$CADDY_HOST_ALIAS}:{$PORT_RADARR_HTTP}
+}
+
+portainer.{$DUCKDNS_SUBDOMAIN}.{$DUCKDNS_ZONE} {
+	import common
+	reverse_proxy {$CADDY_HOST_ALIAS}:{$PORT_PORTAINER_HTTP}
+}

@@ -1,0 +1,4 @@
+.env
+.DS_Store
+services/caddy/caddy/data/
+services/caddy/caddy/config/

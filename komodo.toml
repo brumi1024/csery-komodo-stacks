@@ -1,0 +1,255 @@
+[[server]]
+name = "Local"
+[server.config]
+enabled = true
+
+##
+
+[[stack]]
+name = "caddy"
+tags = [
+  "proxy",
+  "reverse-proxy",
+  "caddy",
+  "duckdns"
+]
+[stack.config]
+server = "Local"
+linked_repo = "csery-komodo-stacks"
+poll_for_updates = true
+auto_update = true
+run_directory = "services/caddy"
+file_paths = ["docker-compose.yaml"]
+config_files = [
+  { path = "config/Caddyfile", requires = "Redeploy" }
+]
+environment = """
+# Caddy build
+CADDY_VERSION=[[CADDY_VERSION]]
+
+# Host directories and logging
+CONFIG_DIR=[[CONFIG_DIR]]
+LOGGING_DRIVER=[[LOGGING_DRIVER]]
+
+# Public ACME / DDNS configuration
+ACME_EMAIL=[[ACME_EMAIL]]
+DUCKDNS_ZONE=[[DUCKDNS_ZONE]]
+DUCKDNS_SUBDOMAIN=[[DUCKDNS_SUBDOMAIN]]
+DUCKDNS_TOKEN=[[CADDY_DUCKDNS_TOKEN]]
+
+# Legacy host target
+CADDY_HOST_ALIAS=[[CADDY_HOST_ALIAS]]
+
+# Caddy ports
+PORT_CADDY_HTTP=[[PORT_CADDY_HTTP]]
+PORT_CADDY_HTTPS=[[PORT_CADDY_HTTPS]]
+PORT_CADDY_ADMIN=[[PORT_CADDY_ADMIN]]
+
+# Existing host-published app ports
+PORT_HEIMDALL_HTTP=[[PORT_HEIMDALL_HTTP]]
+PORT_NEXTCLOUD_HTTP=[[PORT_NEXTCLOUD_HTTP]]
+PORT_SONARR_HTTP=[[PORT_SONARR_HTTP]]
+PORT_QBITTORRENT_HTTP=[[PORT_QBITTORRENT_HTTP]]
+PORT_RADARR_HTTP=[[PORT_RADARR_HTTP]]
+PORT_PORTAINER_HTTP=[[PORT_PORTAINER_HTTP]]
+"""
+
+##
+
+[[repo]]
+name = "csery-komodo-stacks"
+[repo.config]
+server = "Local"
+git_account = "brumi1024"
+repo = "brumi1024/csery-komodo-stacks"
+
+##
+
+[[procedure]]
+name = "Backup Core Database"
+description = "Triggers the Core database backup at the scheduled time."
+tags = ["system"]
+config.schedule = "Every day at 01:00"
+
+[[procedure.config.stage]]
+name = "Stage 1"
+enabled = true
+executions = [
+  { execution.type = "BackupCoreDatabase", execution.params = {}, enabled = true }
+]
+
+##
+
+[[procedure]]
+name = "Global Auto Update"
+description = "Pulls and auto updates Stacks and Deployments using 'poll_for_updates' or 'auto_update'."
+tags = ["system"]
+config.schedule = "Every day at 03:00"
+
+[[procedure.config.stage]]
+name = "Stage 1"
+enabled = true
+executions = [
+  { execution.type = "GlobalAutoUpdate", execution.params.skip_auto_update = false, enabled = true }
+]
+
+##
+
+[[procedure]]
+name = "Rotate Server Keys"
+description = "Rotates all currently connected Server keys."
+tags = ["system"]
+config.schedule = "Every day at 06:00"
+
+[[procedure.config.stage]]
+name = "Stage 1"
+enabled = true
+executions = [
+  { execution.type = "RotateAllServerKeys", execution.params = {}, enabled = true }
+]
+
+##
+
+[[builder]]
+name = "Local"
+[builder.config]
+type = "Server"
+params.server_id = "Local"
+
+##
+
+[[resource_sync]]
+name = "csery-komodo-sync"
+[resource_sync.config]
+linked_repo = "csery-komodo-stacks"
+resource_path = ["komodo.toml"]
+managed = true
+include_variables = true
+
+##
+
+[[variable]]
+name = "ACME_EMAIL"
+description = "Email address used for ACME account registration"
+value = "replace-me@example.com"
+is_secret = false
+
+##
+
+[[variable]]
+name = "CADDY_HOST_ALIAS"
+description = "Hostname Caddy uses to reach host-published legacy containers"
+value = "csery-nas"
+is_secret = false
+
+##
+
+[[variable]]
+name = "CADDY_VERSION"
+description = "Caddy version used for the custom build"
+value = "2.11.2"
+is_secret = false
+
+##
+
+[[variable]]
+name = "CONFIG_DIR"
+description = "Host directory for persistent container data"
+value = "/docker"
+is_secret = false
+
+##
+
+[[variable]]
+name = "DUCKDNS_ZONE"
+description = "DuckDNS zone"
+value = "duckdns.org"
+is_secret = false
+
+##
+
+[[variable]]
+name = "LOGGING_DRIVER"
+description = "Docker logging driver"
+value = "local"
+is_secret = false
+
+##
+
+[[variable]]
+name = "PORT_CADDY_ADMIN"
+description = "Caddy admin API port"
+value = "2019"
+is_secret = false
+
+##
+
+[[variable]]
+name = "PORT_CADDY_HTTP"
+description = "Caddy HTTP port"
+value = "80"
+is_secret = false
+
+##
+
+[[variable]]
+name = "PORT_CADDY_HTTPS"
+description = "Caddy HTTPS port"
+value = "443"
+is_secret = false
+
+##
+
+[[variable]]
+name = "PORT_HEIMDALL_HTTP"
+description = "Legacy Heimdall host HTTP port"
+value = "10080"
+is_secret = false
+
+##
+
+[[variable]]
+name = "PORT_NEXTCLOUD_HTTP"
+description = "Legacy Nextcloud host HTTP port"
+value = "8082"
+is_secret = false
+
+##
+
+[[variable]]
+name = "PORT_PORTAINER_HTTP"
+description = "Legacy Portainer host HTTP port"
+value = "9000"
+is_secret = false
+
+##
+
+[[variable]]
+name = "PORT_QBITTORRENT_HTTP"
+description = "Legacy qBittorrent host HTTP port"
+value = "8080"
+is_secret = false
+
+##
+
+[[variable]]
+name = "PORT_RADARR_HTTP"
+description = "Legacy Radarr host HTTP port"
+value = "7878"
+is_secret = false
+
+##
+
+[[variable]]
+name = "PORT_SONARR_HTTP"
+description = "Legacy Sonarr host HTTP port"
+value = "8989"
+is_secret = false
+
+##
+
+[[variable]]
+name = "TZ"
+description = "Timezone"
+value = "Europe/Budapest"
+is_secret = false

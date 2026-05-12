@@ -1,0 +1,45 @@
+name: caddy
+
+services:
+  caddy:
+    container_name: caddy
+    build:
+      context: ./caddy-build
+      dockerfile: Dockerfile
+      args:
+        CADDY_VERSION: ${CADDY_VERSION:-2.11.2}
+    restart: unless-stopped
+    logging:
+      driver: ${LOGGING_DRIVER:-local}
+    environment:
+      ACME_EMAIL: ${ACME_EMAIL:?Set ACME_EMAIL in Komodo variables}
+      CADDY_HOST_ALIAS: ${CADDY_HOST_ALIAS:-csery-nas}
+      DUCKDNS_SUBDOMAIN: ${DUCKDNS_SUBDOMAIN:?Set DUCKDNS_SUBDOMAIN in Komodo secrets}
+      DUCKDNS_TOKEN: ${DUCKDNS_TOKEN:?Set DUCKDNS_TOKEN in Komodo secrets}
+      DUCKDNS_ZONE: ${DUCKDNS_ZONE:-duckdns.org}
+      PORT_CADDY_ADMIN: ${PORT_CADDY_ADMIN:-2019}
+      PORT_HEIMDALL_HTTP: ${PORT_HEIMDALL_HTTP:-10080}
+      PORT_NEXTCLOUD_HTTP: ${PORT_NEXTCLOUD_HTTP:-8082}
+      PORT_PORTAINER_HTTP: ${PORT_PORTAINER_HTTP:-9000}
+      PORT_QBITTORRENT_HTTP: ${PORT_QBITTORRENT_HTTP:-8080}
+      PORT_RADARR_HTTP: ${PORT_RADARR_HTTP:-7878}
+      PORT_SONARR_HTTP: ${PORT_SONARR_HTTP:-8989}
+    ports:
+      - ${PORT_CADDY_HTTP:-80}:80
+      - ${PORT_CADDY_HTTPS:-443}:443
+      - ${PORT_CADDY_HTTPS:-443}:443/udp
+      - ${PORT_CADDY_ADMIN:-2019}:2019
+    extra_hosts:
+      - "${CADDY_HOST_ALIAS:-csery-nas}:host-gateway"
+    volumes:
+      - ./config/Caddyfile:/etc/caddy/Caddyfile:ro
+      - ${CONFIG_DIR:-/docker}/caddy/data:/data
+      - ${CONFIG_DIR:-/docker}/caddy/config:/config
+      - ${CONFIG_DIR:-/docker}/caddy/logs:/var/log/caddy
+    healthcheck:
+      test: ["CMD", "caddy", "version"]
+    labels:
+      - homepage.group=Administration
+      - homepage.name=Caddy
+      - homepage.icon=caddy.svg
+      - homepage.description=Reverse Proxy
