@@ -45,7 +45,7 @@ radarr.{$DUCKDNS_SUBDOMAIN}.{$DUCKDNS_ZONE} {
 	reverse_proxy {$CADDY_HOST_ALIAS}:{$PORT_RADARR_HTTP}
 }
 
-portainer.{$DUCKDNS_SUBDOMAIN}.{$DUCKDNS_ZONE} {
+komodo.{$DUCKDNS_SUBDOMAIN}.{$DUCKDNS_ZONE} {
 	import common
-	reverse_proxy {$CADDY_HOST_ALIAS}:{$PORT_PORTAINER_HTTP}
+	reverse_proxy {$CADDY_HOST_ALIAS}:{$PORT_KOMODO_HTTP}
 }

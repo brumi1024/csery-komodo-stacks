@@ -13,42 +13,46 @@ Secret values are referenced as Komodo Core secrets.
 | --- | --- | --- |
 | `caddy` | `services/caddy/` | Caddy reverse proxy with DuckDNS DDNS support |
 
-The `caddy` stack migrates the public reverse proxy from Traefik to Caddy while
-leaving the existing standalone Docker containers in place. Caddy proxies to
-their host-published ports first; individual apps can be moved into
-Komodo-managed Compose stacks later.
+The `caddy` stack runs the public reverse proxy and DuckDNS updater. It proxies
+to host-published ports first; individual apps can be moved into Komodo-managed
+Compose stacks later.
 
 ## Requirements
 
-- Komodo 2.x with a server target named `docker`
+- Komodo 2.x with a server target named `Local`
 - This repository connected as a Komodo repo or resource sync source
 - DuckDNS token and DuckDNS subdomain provided as Komodo Core secrets
 - Existing app containers still publishing their current host ports
-- Traefik stopped before the final Caddy deploy, because Traefik and Caddy both
-  bind host ports `80` and `443`
+- Host ports `80` and `443` available for Caddy
 
 Do not manually run `docker compose up` on the target host for these managed
 stacks. Deploy and redeploy through Komodo.
 
 ## Setup
 
-1. Create or confirm the Komodo server target named `docker`.
-2. Provide `CADDY_DUCKDNS_TOKEN` and `DUCKDNS_SUBDOMAIN` as Komodo Core
-   secrets in the Core config file. Do not use Resource Sync variables for
-   these values.
-3. Create a Resource Sync pointing at this repo and `komodo.toml`.
-4. Enable Managed Mode on the Resource Sync if Komodo UI edits should commit
+1. Create or confirm the Komodo server target named `Local`.
+2. Mount a Komodo Core config file at `/config/config.toml` in the Core
+   container.
+3. Add the DuckDNS secrets to the mounted Core config file:
+
+   ```toml
+   [secrets]
+   CADDY_DUCKDNS_TOKEN = "..."
+   DUCKDNS_SUBDOMAIN = "..."
+   ```
+
+4. Restart Komodo Core so the mounted secrets are loaded.
+5. Create a Resource Sync pointing at this repo and `komodo.toml`.
+6. Enable Managed Mode on the Resource Sync if Komodo UI edits should commit
    back to this file.
-5. Run the Resource Sync to create or update the stack and non-secret variables.
-6. Replace `ACME_EMAIL` with the email address Caddy should use for ACME account
+7. Run the Resource Sync to create or update the stack and non-secret variables.
+8. Replace `ACME_EMAIL` with the email address Caddy should use for ACME account
    registration.
-7. Confirm the legacy app port variables match the ports currently published on
+9. Confirm the legacy app port variables match the ports currently published on
    `csery-nas`.
-8. Deploy the `caddy` stack from Komodo. The first deploy may fail while Traefik
-   still owns ports `80` and `443`.
-9. Stop Traefik on `csery-nas`.
-10. Redeploy `caddy` from Komodo.
-11. Verify Caddy logs and each public hostname.
+10. Confirm host ports `80` and `443` are free on `csery-nas`.
+11. Deploy the `caddy` stack from Komodo.
+12. Verify Caddy logs and each public hostname.
 
 Example verification commands on the target host:
 
@@ -56,13 +60,6 @@ Example verification commands on the target host:
 docker logs caddy --tail=100
 curl -I https://heimdall.example.duckdns.org
 curl -I https://nextcloud.example.duckdns.org
-```
-
-Rollback:
-
-```bash
-docker stop caddy
-docker start traefik
 ```
 
 ## Komodo Variables
@@ -92,8 +89,8 @@ These are defined in `komodo.toml` and referenced by stack config as
 
 ### Legacy App Port Variables
 
-The initial Caddy migration proxies to existing host-published containers, so
-these values must match the ports already exposed on `csery-nas`.
+Caddy proxies to existing host-published containers, so these values must match
+the ports already exposed on `csery-nas`.
 
 | Variable | Default | Public hostname |
 | --- | --- | --- |
