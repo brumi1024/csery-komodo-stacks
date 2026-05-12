@@ -1,0 +1,17 @@
+name: monitoring
+
+services:
+  glances:
+    image: nicolargo/glances:${GLANCES_TAG:-latest}
+    container_name: glances
+    restart: unless-stopped
+    logging:
+      driver: ${LOGGING_DRIVER:-local}
+    environment:
+      GLANCES_OPT: ${GLANCES_OPT:--w}
+    ports:
+      - ${PORT_GLANCES_HTTP:-61208}:61208
+      - ${PORT_GLANCES_API:-61209}:61209
+    volumes:
+      - /etc/timezone:/etc/timezone:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro

@@ -12,10 +12,11 @@ Secret values are referenced as Komodo Core secrets.
 | Stack | Path | Description |
 | --- | --- | --- |
 | `caddy` | `services/caddy/` | Caddy reverse proxy with DuckDNS DDNS support |
+| `monitoring` | `services/monitoring/` | Glances server monitoring |
+| `servarr` | `services/servarr/` | Sonarr, Radarr, qBittorrent, and Jackett |
 
 The `caddy` stack runs the public reverse proxy and DuckDNS updater. It proxies
-to host-published ports first; individual apps can be moved into Komodo-managed
-Compose stacks later.
+to host-published ports for apps that still publish directly on `csery-nas`.
 
 ## Requirements
 
@@ -74,6 +75,8 @@ These are defined in `komodo.toml` and referenced by stack config as
 | `TZ` | `Europe/Budapest` | Yes | Timezone for stacks that need one |
 | `CONFIG_DIR` | `/docker` | Yes | Host directory for persistent container data |
 | `LOGGING_DRIVER` | `local` | Yes | Docker logging driver |
+| `PUID` | `1000` | Yes | Default LinuxServer.io user ID |
+| `PGID` | `1000` | Yes | Default LinuxServer.io group ID |
 
 ### Caddy Variables
 
@@ -87,19 +90,28 @@ These are defined in `komodo.toml` and referenced by stack config as
 | `PORT_CADDY_HTTPS` | `443` | Yes | Host HTTPS port published by Caddy, including UDP for HTTP/3 |
 | `PORT_CADDY_ADMIN` | `2019` | Yes | Host port for the Caddy admin API |
 
-### Legacy App Port Variables
+### Caddy App Port Variables
 
-Caddy proxies to existing host-published containers, so these values must match
-the ports already exposed on `csery-nas`.
+Caddy proxies to host-published app ports, so these values must match the ports
+exposed on `csery-nas`.
 
 | Variable | Default | Public hostname |
 | --- | --- | --- |
 | `PORT_HEIMDALL_HTTP` | `10080` | `heimdall.<duckdns-subdomain>.duckdns.org` |
+| `PORT_KOMODO_HTTP` | `9120` | `komodo.<duckdns-subdomain>.duckdns.org` |
 | `PORT_NEXTCLOUD_HTTP` | `8082` | `nextcloud.<duckdns-subdomain>.duckdns.org` |
 | `PORT_SONARR_HTTP` | `8989` | `sonarr.<duckdns-subdomain>.duckdns.org` |
 | `PORT_QBITTORRENT_HTTP` | `8080` | `qbittorrent.<duckdns-subdomain>.duckdns.org` |
 | `PORT_RADARR_HTTP` | `7878` | `radarr.<duckdns-subdomain>.duckdns.org` |
-| `PORT_PORTAINER_HTTP` | `9000` | `portainer.<duckdns-subdomain>.duckdns.org` |
+
+### Managed Stack Port Variables
+
+| Variable | Default | Used by |
+| --- | --- | --- |
+| `PORT_JACKETT_HTTP` | `9117` | Jackett web UI |
+| `PORT_QBITTORRENT_TORRENTING` | `57305` | qBittorrent TCP/UDP torrent port |
+| `PORT_GLANCES_HTTP` | `61208` | Glances web UI |
+| `PORT_GLANCES_API` | `61209` | Glances API |
 
 ### Secrets
 

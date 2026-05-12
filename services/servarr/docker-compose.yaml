@@ -1,0 +1,67 @@
+name: servarr
+
+services:
+  sonarr:
+    image: linuxserver/sonarr:${SONARR_TAG:-latest}
+    container_name: sonarr
+    restart: unless-stopped
+    logging:
+      driver: ${LOGGING_DRIVER:-local}
+    environment:
+      PUID: ${PUID:-1000}
+      PGID: ${PGID:-1000}
+      TZ: ${TZ:-Europe/Budapest}
+    ports:
+      - ${PORT_SONARR_HTTP:-8989}:8989
+    volumes:
+      - ${CONFIG_DIR:-/docker}/sonarr/config:/config
+      - /media:/data
+
+  radarr:
+    image: linuxserver/radarr:${RADARR_TAG:-latest}
+    container_name: radarr
+    restart: unless-stopped
+    logging:
+      driver: ${LOGGING_DRIVER:-local}
+    environment:
+      PUID: ${PUID:-1000}
+      PGID: ${PGID:-1000}
+      TZ: ${TZ:-Europe/Budapest}
+    ports:
+      - ${PORT_RADARR_HTTP:-7878}:7878
+    volumes:
+      - ${CONFIG_DIR:-/docker}/radarr/config:/config
+      - /media:/data
+
+  qbittorrent:
+    image: linuxserver/qbittorrent:${QBITTORRENT_TAG:-latest}
+    container_name: qbittorrent
+    restart: unless-stopped
+    logging:
+      driver: ${LOGGING_DRIVER:-local}
+    environment:
+      PUID: ${PUID:-1000}
+      PGID: ${PGID:-1000}
+      TZ: ${TZ:-Europe/Budapest}
+    ports:
+      - ${PORT_QBITTORRENT_HTTP:-8080}:8080
+      - ${PORT_QBITTORRENT_TORRENTING:-57305}:6881
+      - ${PORT_QBITTORRENT_TORRENTING:-57305}:6881/udp
+    volumes:
+      - ${CONFIG_DIR:-/docker}/qbittorrent/config:/config
+      - /media/downloads:/data/downloads
+
+  jackett:
+    image: linuxserver/jackett:${JACKETT_TAG:-latest}
+    container_name: jackett
+    restart: unless-stopped
+    logging:
+      driver: ${LOGGING_DRIVER:-local}
+    environment:
+      TZ: ${TZ:-Europe/Budapest}
+    ports:
+      - ${PORT_JACKETT_HTTP:-9117}:9117
+    volumes:
+      - ${CONFIG_DIR:-/docker}/jackett:/config
+      - /media/torrents:/downloads
+      - /etc/localtime:/etc/localtime:ro
