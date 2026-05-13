@@ -64,6 +64,7 @@ Caddy config changes under `services/caddy/config/` require a Caddy redeploy.
 ## Public Hosts
 
 - `heimdall.<duckdns-subdomain>.duckdns.org`
+- `beszel.<duckdns-subdomain>.duckdns.org`
 - `immich.<duckdns-subdomain>.duckdns.org`
 - `komodo.<duckdns-subdomain>.duckdns.org`
 - `nextcloud.<duckdns-subdomain>.duckdns.org`

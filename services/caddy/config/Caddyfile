@@ -25,6 +25,11 @@ heimdall.{$DUCKDNS_SUBDOMAIN}.{$DUCKDNS_ZONE} {
 	reverse_proxy {$CADDY_HOST_ALIAS}:{$PORT_HEIMDALL_HTTP}
 }
 
+beszel.{$DUCKDNS_SUBDOMAIN}.{$DUCKDNS_ZONE} {
+	import common
+	reverse_proxy {$CADDY_HOST_ALIAS}:{$PORT_BESZEL_HTTP}
+}
+
 nextcloud.{$DUCKDNS_SUBDOMAIN}.{$DUCKDNS_ZONE} {
 	import common
 	reverse_proxy {$CADDY_HOST_ALIAS}:{$PORT_NEXTCLOUD_HTTP}
