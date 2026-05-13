@@ -49,3 +49,8 @@ komodo.{$DUCKDNS_SUBDOMAIN}.{$DUCKDNS_ZONE} {
 	import common
 	reverse_proxy {$CADDY_HOST_ALIAS}:{$PORT_KOMODO_HTTP}
 }
+
+immich.{$DUCKDNS_SUBDOMAIN}.{$DUCKDNS_ZONE} {
+	import common
+	reverse_proxy {$CADDY_HOST_ALIAS}:{$PORT_IMMICH_HTTP}
+}

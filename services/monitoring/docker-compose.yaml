@@ -1,17 +1,33 @@
 name: monitoring
 
 services:
-  glances:
-    image: nicolargo/glances:${GLANCES_TAG:-latest}
-    container_name: glances
+  beszel:
+    image: henrygd/beszel:${BESZEL_TAG:-latest}
+    container_name: beszel
     restart: unless-stopped
     logging:
       driver: ${LOGGING_DRIVER:-local}
     environment:
-      GLANCES_OPT: ${GLANCES_OPT:--w}
+      APP_URL: ${BESZEL_APP_URL:-http://localhost:8090}
     ports:
-      - ${PORT_GLANCES_HTTP:-61208}:61208
-      - ${PORT_GLANCES_API:-61209}:61209
+      - ${PORT_BESZEL_HTTP:-8090}:8090
     volumes:
-      - /etc/timezone:/etc/timezone:ro
+      - ${CONFIG_DIR:?CONFIG_DIR is required}/beszel/hub:/beszel_data
+      - ${CONFIG_DIR:?CONFIG_DIR is required}/beszel/socket:/beszel_socket
+
+  beszel-agent:
+    image: henrygd/beszel-agent:${BESZEL_AGENT_TAG:-latest}
+    container_name: beszel-agent
+    restart: unless-stopped
+    network_mode: host
+    logging:
+      driver: ${LOGGING_DRIVER:-local}
+    environment:
+      LISTEN: /beszel_socket/beszel.sock
+      HUB_URL: ${BESZEL_HUB_URL:-http://localhost:8090}
+      TOKEN: ${BESZEL_AGENT_TOKEN:-}
+      KEY: ${BESZEL_AGENT_KEY:-}
+    volumes:
+      - ${CONFIG_DIR:?CONFIG_DIR is required}/beszel/agent:/var/lib/beszel-agent
+      - ${CONFIG_DIR:?CONFIG_DIR is required}/beszel/socket:/beszel_socket
       - /var/run/docker.sock:/var/run/docker.sock:ro

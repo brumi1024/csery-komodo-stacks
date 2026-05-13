@@ -48,6 +48,7 @@ PORT_CADDY_ADMIN=[[PORT_CADDY_ADMIN]]
 # Existing host-published app ports
 PORT_HEIMDALL_HTTP=[[PORT_HEIMDALL_HTTP]]
 PORT_KOMODO_HTTP=[[PORT_KOMODO_HTTP]]
+PORT_IMMICH_HTTP=[[PORT_IMMICH_HTTP]]
 PORT_NEXTCLOUD_HTTP=[[PORT_NEXTCLOUD_HTTP]]
 PORT_SONARR_HTTP=[[PORT_SONARR_HTTP]]
 PORT_QBITTORRENT_HTTP=[[PORT_QBITTORRENT_HTTP]]
@@ -101,7 +102,7 @@ name = "monitoring"
 tags = [
   "monitoring",
   "server-stats",
-  "glances"
+  "beszel"
 ]
 [stack.config]
 server = "Local"
@@ -111,16 +112,20 @@ linked_repo = "csery-komodo-stacks"
 run_directory = "services/monitoring"
 file_paths = ["docker-compose.yaml"]
 environment = """
-# Logging configuration
+# Host directories and logging
+CONFIG_DIR=[[CONFIG_DIR]]
 LOGGING_DRIVER=[[LOGGING_DRIVER]]
 
 # Port configuration
-PORT_GLANCES_HTTP=[[PORT_GLANCES_HTTP]]
-PORT_GLANCES_API=[[PORT_GLANCES_API]]
+PORT_BESZEL_HTTP=[[PORT_BESZEL_HTTP]]
 
-# Glances configuration
-GLANCES_OPT=-w
-GLANCES_TAG=latest
+# Beszel configuration
+BESZEL_TAG=latest
+BESZEL_AGENT_TAG=latest
+BESZEL_APP_URL=http://[[CADDY_HOST_ALIAS]]:[[PORT_BESZEL_HTTP]]
+BESZEL_HUB_URL=http://localhost:[[PORT_BESZEL_HTTP]]
+BESZEL_AGENT_KEY=[[BESZEL_AGENT_KEY]]
+BESZEL_AGENT_TOKEN=[[BESZEL_AGENT_TOKEN]]
 """
 
 ##
@@ -158,6 +163,40 @@ MYSQL_TAG=8.4
 NEXTCLOUD_MYSQL_DATABASE=nextcloud
 NEXTCLOUD_MYSQL_USER=nextcloud-user
 NEXTCLOUD_MYSQL_PASSWORD=[[NEXTCLOUD_MYSQL_PASSWORD]]
+"""
+
+##
+
+[[stack]]
+name = "immich"
+tags = [
+  "photos",
+  "immich",
+  "media"
+]
+[stack.config]
+server = "Local"
+poll_for_updates = true
+auto_update = true
+linked_repo = "csery-komodo-stacks"
+run_directory = "services/immich"
+file_paths = ["docker-compose.yaml"]
+environment = """
+# Host directories and logging
+CONFIG_DIR=[[CONFIG_DIR]]
+LOGGING_DRIVER=[[LOGGING_DRIVER]]
+TZ=[[TZ]]
+
+# Port configuration
+PORT_IMMICH_HTTP=[[PORT_IMMICH_HTTP]]
+
+# Immich configuration
+IMMICH_VERSION=v2
+IMMICH_POSTGRES_TAG=14-vectorchord0.4.3-pgvectors0.2.0
+IMMICH_REDIS_TAG=9
+IMMICH_DB_USERNAME=postgres
+IMMICH_DB_DATABASE_NAME=immich
+IMMICH_DB_PASSWORD=[[IMMICH_DB_PASSWORD]]
 """
 
 ##
@@ -349,17 +388,9 @@ is_secret = false
 ##
 
 [[variable]]
-name = "PORT_GLANCES_API"
-description = "Glances API port"
-value = "61209"
-is_secret = false
-
-##
-
-[[variable]]
-name = "PORT_GLANCES_HTTP"
-description = "Glances web UI port"
-value = "61208"
+name = "PORT_BESZEL_HTTP"
+description = "Beszel web UI port"
+value = "8090"
 is_secret = false
 
 ##
@@ -376,6 +407,14 @@ is_secret = false
 name = "PORT_KOMODO_HTTP"
 description = "Komodo port"
 value = "9120"
+is_secret = false
+
+##
+
+[[variable]]
+name = "PORT_IMMICH_HTTP"
+description = "Immich HTTP port"
+value = "2283"
 is_secret = false
 
 ##
