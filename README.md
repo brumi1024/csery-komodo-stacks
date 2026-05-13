@@ -13,6 +13,7 @@ Secret values are referenced as Komodo Core secrets.
 | --- | --- | --- |
 | `caddy` | `services/caddy/` | Caddy reverse proxy with DuckDNS DDNS support |
 | `monitoring` | `services/monitoring/` | Glances server monitoring |
+| `nextcloud` | `services/nextcloud/` | Nextcloud with MySQL sidecar |
 | `servarr` | `services/servarr/` | Sonarr, Radarr, qBittorrent, and Jackett |
 
 The `caddy` stack runs the public reverse proxy and DuckDNS updater. It proxies
@@ -40,6 +41,7 @@ stacks. Deploy and redeploy through Komodo.
    [secrets]
    CADDY_DUCKDNS_TOKEN = "..."
    DUCKDNS_SUBDOMAIN = "..."
+   NEXTCLOUD_MYSQL_PASSWORD = "..."
    ```
 
 4. Restart Komodo Core so the mounted secrets are loaded.
@@ -119,6 +121,7 @@ exposed on `csery-nas`.
 | --- | --- | --- |
 | `[[CADDY_DUCKDNS_TOKEN]]` | `komodo.toml` | DuckDNS token passed into Caddy as `DUCKDNS_TOKEN` |
 | `[[DUCKDNS_SUBDOMAIN]]` | `komodo.toml` | DuckDNS subdomain passed into Caddy as `DUCKDNS_SUBDOMAIN` |
+| `[[NEXTCLOUD_MYSQL_PASSWORD]]` | `komodo.toml` | Existing password for the `nextcloud-user` MySQL account |
 
 Keep secret values out of Git and out of Resource Sync-managed variables. Add
 new stack secrets as Komodo Core secrets and reference them from `komodo.toml`
@@ -132,6 +135,7 @@ Core secrets must be configured in Komodo Core config, not with arbitrary
 [secrets]
 CADDY_DUCKDNS_TOKEN = "..."
 DUCKDNS_SUBDOMAIN = "..."
+NEXTCLOUD_MYSQL_PASSWORD = "..."
 ```
 
 ## Stack Layout

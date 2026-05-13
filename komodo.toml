@@ -125,6 +125,41 @@ GLANCES_TAG=latest
 
 ##
 
+[[stack]]
+name = "nextcloud"
+tags = [
+  "files",
+  "nextcloud",
+  "mysql"
+]
+[stack.config]
+server = "Local"
+poll_for_updates = true
+auto_update = true
+linked_repo = "csery-komodo-stacks"
+run_directory = "services/nextcloud"
+file_paths = ["docker-compose.yaml"]
+environment = """
+# Host directories and logging
+CONFIG_DIR=[[CONFIG_DIR]]
+LOGGING_DRIVER=[[LOGGING_DRIVER]]
+
+# Port configuration
+PORT_NEXTCLOUD_HTTP=[[PORT_NEXTCLOUD_HTTP]]
+
+# Nextcloud configuration
+NEXTCLOUD_TAG=latest
+NEXTCLOUD_TRUSTED_DOMAINS=nextcloud.[[DUCKDNS_SUBDOMAIN]].[[DUCKDNS_ZONE]]
+
+# MySQL configuration
+MYSQL_TAG=8.0.46
+NEXTCLOUD_MYSQL_DATABASE=nextcloud
+NEXTCLOUD_MYSQL_USER=nextcloud-user
+NEXTCLOUD_MYSQL_PASSWORD=[[NEXTCLOUD_MYSQL_PASSWORD]]
+"""
+
+##
+
 [[repo]]
 name = "csery-komodo-stacks"
 [repo.config]
@@ -319,7 +354,7 @@ is_secret = false
 
 [[variable]]
 name = "PORT_NEXTCLOUD_HTTP"
-description = "Legacy Nextcloud host HTTP port"
+description = "Nextcloud HTTP port"
 value = "8082"
 is_secret = false
 

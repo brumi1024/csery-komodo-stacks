@@ -1,0 +1,47 @@
+name: nextcloud
+
+services:
+  nextcloud:
+    image: nextcloud:${NEXTCLOUD_TAG:-latest}
+    container_name: nextcloud
+    restart: unless-stopped
+    logging:
+      driver: ${LOGGING_DRIVER:-local}
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      MYSQL_DATABASE: ${NEXTCLOUD_MYSQL_DATABASE:-nextcloud}
+      MYSQL_HOST: mysql
+      MYSQL_PASSWORD: ${NEXTCLOUD_MYSQL_PASSWORD:?Set NEXTCLOUD_MYSQL_PASSWORD in Komodo secrets}
+      MYSQL_USER: ${NEXTCLOUD_MYSQL_USER:-nextcloud-user}
+      NEXTCLOUD_TRUSTED_DOMAINS: ${NEXTCLOUD_TRUSTED_DOMAINS:?Set NEXTCLOUD_TRUSTED_DOMAINS in Komodo environment}
+      OVERWRITEPROTOCOL: https
+    ports:
+      - ${PORT_NEXTCLOUD_HTTP:-8082}:80
+    volumes:
+      - ${CONFIG_DIR:-/docker}/nextcloud:/var/www/html
+      - /media/nextcloud:/var/www/html/data
+
+  mysql:
+    image: mysql:${MYSQL_TAG:-8.0.46}
+    container_name: nextcloud-mysql
+    restart: unless-stopped
+    logging:
+      driver: ${LOGGING_DRIVER:-local}
+    environment:
+      MYSQL_DATABASE: ${NEXTCLOUD_MYSQL_DATABASE:-nextcloud}
+      MYSQL_PASSWORD: ${NEXTCLOUD_MYSQL_PASSWORD:?Set NEXTCLOUD_MYSQL_PASSWORD in Komodo secrets}
+      MYSQL_USER: ${NEXTCLOUD_MYSQL_USER:-nextcloud-user}
+    volumes:
+      - ${CONFIG_DIR:-/docker}/mysql:/var/lib/mysql
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "mysqladmin ping -h 127.0.0.1 -u\"$${MYSQL_USER}\" -p\"$${MYSQL_PASSWORD}\" --silent",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
