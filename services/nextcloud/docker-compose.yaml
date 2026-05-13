@@ -2,7 +2,7 @@ name: nextcloud
 
 services:
   nextcloud:
-    image: nextcloud:${NEXTCLOUD_TAG:-latest}
+    image: nextcloud:${NEXTCLOUD_TAG:-33-apache}
     container_name: nextcloud
     restart: unless-stopped
     logging:
@@ -15,10 +15,28 @@ services:
       MYSQL_HOST: mysql
       MYSQL_PASSWORD: ${NEXTCLOUD_MYSQL_PASSWORD:?Set NEXTCLOUD_MYSQL_PASSWORD in Komodo secrets}
       MYSQL_USER: ${NEXTCLOUD_MYSQL_USER:-nextcloud-user}
+      NEXTCLOUD_INIT_HTACCESS: ${NEXTCLOUD_INIT_HTACCESS:-true}
       NEXTCLOUD_TRUSTED_DOMAINS: ${NEXTCLOUD_TRUSTED_DOMAINS:?Set NEXTCLOUD_TRUSTED_DOMAINS in Komodo environment}
+      OVERWRITECLIURL: https://${NEXTCLOUD_TRUSTED_DOMAINS:?Set NEXTCLOUD_TRUSTED_DOMAINS in Komodo environment}
+      OVERWRITEHOST: ${NEXTCLOUD_TRUSTED_DOMAINS:?Set NEXTCLOUD_TRUSTED_DOMAINS in Komodo environment}
       OVERWRITEPROTOCOL: https
+      TRUSTED_PROXIES: ${NEXTCLOUD_TRUSTED_PROXIES:-172.16.0.0/12}
     ports:
       - ${PORT_NEXTCLOUD_HTTP:-8082}:80
+    volumes:
+      - ${CONFIG_DIR:-/docker}/nextcloud:/var/www/html
+      - /media/nextcloud:/var/www/html/data
+
+  cron:
+    image: nextcloud:${NEXTCLOUD_TAG:-33-apache}
+    container_name: nextcloud-cron
+    restart: unless-stopped
+    logging:
+      driver: ${LOGGING_DRIVER:-local}
+    depends_on:
+      mysql:
+        condition: service_healthy
+    entrypoint: /cron.sh
     volumes:
       - ${CONFIG_DIR:-/docker}/nextcloud:/var/www/html
       - /media/nextcloud:/var/www/html/data
@@ -27,6 +45,9 @@ services:
     image: mysql:${MYSQL_TAG:-8.0.46}
     container_name: nextcloud-mysql
     restart: unless-stopped
+    command:
+      - --transaction-isolation=READ-COMMITTED
+      - --binlog-format=ROW
     logging:
       driver: ${LOGGING_DRIVER:-local}
     environment:

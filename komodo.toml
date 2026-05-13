@@ -148,14 +148,42 @@ LOGGING_DRIVER=[[LOGGING_DRIVER]]
 PORT_NEXTCLOUD_HTTP=[[PORT_NEXTCLOUD_HTTP]]
 
 # Nextcloud configuration
-NEXTCLOUD_TAG=latest
+NEXTCLOUD_TAG=33-apache
+NEXTCLOUD_INIT_HTACCESS=true
 NEXTCLOUD_TRUSTED_DOMAINS=nextcloud.[[DUCKDNS_SUBDOMAIN]].[[DUCKDNS_ZONE]]
+NEXTCLOUD_TRUSTED_PROXIES=172.16.0.0/12
 
 # MySQL configuration
 MYSQL_TAG=8.0.46
 NEXTCLOUD_MYSQL_DATABASE=nextcloud
 NEXTCLOUD_MYSQL_USER=nextcloud-user
 NEXTCLOUD_MYSQL_PASSWORD=[[NEXTCLOUD_MYSQL_PASSWORD]]
+"""
+
+##
+
+[[stack]]
+name = "minidlna"
+tags = [
+  "media",
+  "dlna",
+  "minidlna"
+]
+[stack.config]
+server = "Local"
+poll_for_updates = true
+auto_update = true
+linked_repo = "csery-komodo-stacks"
+run_directory = "services/minidlna"
+file_paths = ["docker-compose.yaml"]
+environment = """
+# Logging configuration
+LOGGING_DRIVER=[[LOGGING_DRIVER]]
+
+# MiniDLNA configuration
+MINIDLNA_TAG=latest
+MINIDLNA_FRIENDLY_NAME=[[CADDY_HOST_ALIAS]]
+PORT_MINIDLNA_HTTP=[[PORT_MINIDLNA_HTTP]]
 """
 
 ##
@@ -348,6 +376,14 @@ is_secret = false
 name = "PORT_KOMODO_HTTP"
 description = "Komodo port"
 value = "9120"
+is_secret = false
+
+##
+
+[[variable]]
+name = "PORT_MINIDLNA_HTTP"
+description = "MiniDLNA HTTP port"
+value = "8201"
 is_secret = false
 
 ##

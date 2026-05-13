@@ -12,6 +12,7 @@ Secret values are referenced as Komodo Core secrets.
 | Stack | Path | Description |
 | --- | --- | --- |
 | `caddy` | `services/caddy/` | Caddy reverse proxy with DuckDNS DDNS support |
+| `minidlna` | `services/minidlna/` | DLNA media server |
 | `monitoring` | `services/monitoring/` | Glances server monitoring |
 | `nextcloud` | `services/nextcloud/` | Nextcloud with MySQL sidecar |
 | `servarr` | `services/servarr/` | Sonarr, Radarr, qBittorrent, and Jackett |
@@ -114,6 +115,7 @@ exposed on `csery-nas`.
 | `PORT_QBITTORRENT_TORRENTING` | `57305` | qBittorrent TCP/UDP torrent port |
 | `PORT_GLANCES_HTTP` | `61208` | Glances web UI |
 | `PORT_GLANCES_API` | `61209` | Glances API |
+| `PORT_MINIDLNA_HTTP` | `8201` | MiniDLNA HTTP port |
 
 ### Secrets
 
@@ -122,6 +124,11 @@ exposed on `csery-nas`.
 | `[[CADDY_DUCKDNS_TOKEN]]` | `komodo.toml` | DuckDNS token passed into Caddy as `DUCKDNS_TOKEN` |
 | `[[DUCKDNS_SUBDOMAIN]]` | `komodo.toml` | DuckDNS subdomain passed into Caddy as `DUCKDNS_SUBDOMAIN` |
 | `[[NEXTCLOUD_MYSQL_PASSWORD]]` | `komodo.toml` | Existing password for the `nextcloud-user` MySQL account |
+
+The Nextcloud stack uses the current major Apache image tag, includes a
+dedicated `cron` container, refreshes htaccess on container startup, and
+configures MySQL with `READ-COMMITTED` transaction isolation plus row-based
+binary logging.
 
 Keep secret values out of Git and out of Resource Sync-managed variables. Add
 new stack secrets as Komodo Core secrets and reference them from `komodo.toml`

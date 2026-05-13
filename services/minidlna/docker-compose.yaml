@@ -1,0 +1,20 @@
+name: minidlna
+
+services:
+  minidlna:
+    image: vladgh/minidlna:${MINIDLNA_TAG:-latest}
+    container_name: minidlna
+    restart: unless-stopped
+    network_mode: host
+    logging:
+      driver: ${LOGGING_DRIVER:-local}
+    environment:
+      MINIDLNA_FRIENDLY_NAME: ${MINIDLNA_FRIENDLY_NAME:-csery-nas}
+      MINIDLNA_MEDIA_DIR1: /movies
+      MINIDLNA_MEDIA_DIR2: /tv
+      MINIDLNA_PORT: ${PORT_MINIDLNA_HTTP:-8201}
+    volumes:
+      - /media/movies:/movies
+      - /media/tv:/tv
+    healthcheck:
+      disable: true
