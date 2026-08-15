@@ -1,0 +1,20 @@
+name: heimdall
+
+services:
+  heimdall:
+    image: linuxserver/heimdall:${HEIMDALL_TAG:-latest}
+    container_name: heimdall
+    restart: unless-stopped
+    logging:
+      driver: ${LOGGING_DRIVER:-local}
+    environment:
+      # Heimdall predates this repo and owns its config as its own uid, not the
+      # shared 1000 the servarr stacks use.
+      PUID: ${HEIMDALL_PUID:-1310}
+      PGID: ${HEIMDALL_PGID:-1310}
+      TZ: ${TZ:-Europe/Budapest}
+    ports:
+      - ${PORT_HEIMDALL_HTTP:-10080}:80
+      - ${PORT_HEIMDALL_HTTPS:-10443}:443
+    volumes:
+      - ${CONFIG_DIR:-/docker}/heimdall:/config

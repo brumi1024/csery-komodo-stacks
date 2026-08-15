@@ -16,7 +16,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        stack: [caddy, immich, minidlna, monitoring, nextcloud, servarr]
+        stack: [caddy, heimdall, immich, minidlna, monitoring, nextcloud, servarr]
     steps:
       - uses: actions/checkout@v4
 

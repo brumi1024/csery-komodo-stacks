@@ -7,6 +7,7 @@ Komodo-managed stacks for `csery-nas`.
 ## Stacks
 
 - `caddy`: public reverse proxy and DuckDNS integration
+- `heimdall`: application dashboard
 - `immich`: photo and video management
 - `minidlna`: DLNA media server
 - `monitoring`: Beszel hub and agent
