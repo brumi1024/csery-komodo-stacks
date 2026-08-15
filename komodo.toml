@@ -198,7 +198,6 @@ IMMICH_REDIS_TAG=9
 IMMICH_DB_USERNAME=postgres
 IMMICH_DB_DATABASE_NAME=immich
 IMMICH_DB_PASSWORD=[[IMMICH_DB_PASSWORD]]
-IMMICH_EXTERNAL_URL=https://immich.[[DUCKDNS_SUBDOMAIN]].[[DUCKDNS_ZONE]]
 """
 
 ##
@@ -302,14 +301,6 @@ include_variables = true
 ##
 
 [[variable]]
-name = "ACME_EMAIL"
-description = "Email address used for ACME account registration"
-value = "replace-me@example.com"
-is_secret = false
-
-##
-
-[[variable]]
 name = "CADDY_HOST_ALIAS"
 description = "Hostname Caddy uses to reach host-published legacy containers"
 value = "csery-nas"
@@ -320,7 +311,7 @@ is_secret = false
 [[variable]]
 name = "CADDY_VERSION"
 description = "Caddy version used for the custom build"
-value = "2.11.2"
+value = "2.11.4"
 is_secret = false
 
 ##

@@ -7,12 +7,12 @@ services:
       context: ./caddy-build
       dockerfile: Dockerfile
       args:
-        CADDY_VERSION: ${CADDY_VERSION:-2.11.2}
+        CADDY_VERSION: ${CADDY_VERSION:-2.11.4}
     restart: unless-stopped
     logging:
       driver: ${LOGGING_DRIVER:-local}
     environment:
-      ACME_EMAIL: ${ACME_EMAIL:?Set ACME_EMAIL in Komodo variables}
+      ACME_EMAIL: ${ACME_EMAIL:?Set ACME_EMAIL in Komodo secrets}
       CADDY_HOST_ALIAS: ${CADDY_HOST_ALIAS:-csery-nas}
       DUCKDNS_SUBDOMAIN: ${DUCKDNS_SUBDOMAIN:?Set DUCKDNS_SUBDOMAIN in Komodo secrets}
       DUCKDNS_TOKEN: ${DUCKDNS_TOKEN:?Set DUCKDNS_TOKEN in Komodo secrets}
@@ -30,7 +30,9 @@ services:
       - ${PORT_CADDY_HTTP:-80}:80
       - ${PORT_CADDY_HTTPS:-443}:443
       - ${PORT_CADDY_HTTPS:-443}:443/udp
-      - ${PORT_CADDY_ADMIN:-2019}:2019
+      # Admin API is unauthenticated and can replace the running config.
+      # Keep it reachable only from the host itself, never from the LAN.
+      - 127.0.0.1:${PORT_CADDY_ADMIN:-2019}:2019
     extra_hosts:
       - "${CADDY_HOST_ALIAS:-csery-nas}:host-gateway"
     volumes:

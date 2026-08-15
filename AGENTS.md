@@ -13,6 +13,9 @@ for Resource Sync Managed Mode.
   Core config `[secrets]` mounted at `/config/config.toml`.
 - The Caddy DuckDNS token and subdomain are expected as
   `[[CADDY_DUCKDNS_TOKEN]]` and `[[DUCKDNS_SUBDOMAIN]]`.
+- The ACME account email is a Core secret as `[[ACME_EMAIL]]`, not a
+  `[[variable]]`. This repo is public, and Managed Mode would otherwise keep
+  overwriting the live value with whatever is committed here.
 
 ## Stack Conventions
 

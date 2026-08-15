@@ -32,6 +32,11 @@ beszel.{$DUCKDNS_SUBDOMAIN}.{$DUCKDNS_ZONE} {
 
 nextcloud.{$DUCKDNS_SUBDOMAIN}.{$DUCKDNS_ZONE} {
 	import common
+
+	# Service discovery endpoints Nextcloud's setup checks require.
+	redir /.well-known/carddav /remote.php/dav 301
+	redir /.well-known/caldav /remote.php/dav 301
+
 	reverse_proxy {$CADDY_HOST_ALIAS}:{$PORT_NEXTCLOUD_HTTP}
 }
 
@@ -58,4 +63,16 @@ komodo.{$DUCKDNS_SUBDOMAIN}.{$DUCKDNS_ZONE} {
 immich.{$DUCKDNS_SUBDOMAIN}.{$DUCKDNS_ZONE} {
 	import common
 	reverse_proxy {$CADDY_HOST_ALIAS}:{$PORT_IMMICH_HTTP}
+}
+
+# Catch-all for hosts we do not serve, such as the bare public IP and the ISP
+# reverse-DNS name. Scanners hit these constantly; close the connection instead
+# of answering with a redirect. Host-specific sites above still take precedence,
+# and Caddy's ACME challenge handler runs ahead of these routes.
+:80 {
+	abort
+}
+
+:443 {
+	abort
 }

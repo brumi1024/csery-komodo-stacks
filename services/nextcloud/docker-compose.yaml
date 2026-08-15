@@ -42,7 +42,7 @@ services:
       - /media/nextcloud:/var/www/html/data
 
   mysql:
-    image: mysql:${MYSQL_TAG:-8.0.46}
+    image: mysql:${MYSQL_TAG:-8.4}
     container_name: nextcloud-mysql
     restart: unless-stopped
     command:
@@ -54,6 +54,10 @@ services:
       MYSQL_DATABASE: ${NEXTCLOUD_MYSQL_DATABASE:-nextcloud}
       MYSQL_PASSWORD: ${NEXTCLOUD_MYSQL_PASSWORD:?Set NEXTCLOUD_MYSQL_PASSWORD in Komodo secrets}
       MYSQL_USER: ${NEXTCLOUD_MYSQL_USER:-nextcloud-user}
+      # The entrypoint refuses to initialise an empty data directory unless one
+      # of the root password variables is set. Nextcloud only ever uses
+      # MYSQL_USER, so no one needs to know the root password.
+      MYSQL_RANDOM_ROOT_PASSWORD: "true"
     volumes:
       - ${CONFIG_DIR:-/docker}/mysql:/var/lib/mysql
     healthcheck:

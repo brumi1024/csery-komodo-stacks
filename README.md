@@ -27,6 +27,7 @@ Mount a Komodo Core config at `/config/config.toml` and define:
 
 ```toml
 [secrets]
+ACME_EMAIL = "..."
 CADDY_DUCKDNS_TOKEN = "..."
 DUCKDNS_SUBDOMAIN = "..."
 NEXTCLOUD_MYSQL_PASSWORD = "..."

@@ -58,6 +58,8 @@ services:
     logging:
       driver: ${LOGGING_DRIVER:-local}
     environment:
+      PUID: ${PUID:-1000}
+      PGID: ${PGID:-1000}
       TZ: ${TZ:-Europe/Budapest}
     ports:
       - ${PORT_JACKETT_HTTP:-9117}:9117
