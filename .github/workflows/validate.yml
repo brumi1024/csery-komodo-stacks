@@ -1,0 +1,77 @@
+name: validate
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+# Komodo deploys straight from main, so anything broken here reaches the NAS on
+# the next Resource Sync. These checks are the only gate in front of that.
+
+jobs:
+  compose:
+    name: compose (${{ matrix.stack }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        stack: [caddy, immich, minidlna, monitoring, nextcloud, servarr]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate compose file
+        # Values only need to be present, not real: the point is to prove the
+        # file resolves once Komodo supplies the environment.
+        env:
+          ACME_EMAIL: ci@example.invalid
+          BESZEL_AGENT_KEY: ci
+          BESZEL_AGENT_TOKEN: ci
+          CONFIG_DIR: /docker
+          DUCKDNS_SUBDOMAIN: ci
+          DUCKDNS_TOKEN: ci
+          IMMICH_DB_PASSWORD: ci
+          NEXTCLOUD_MYSQL_PASSWORD: ci
+          NEXTCLOUD_TRUSTED_DOMAINS: nextcloud.ci.duckdns.org
+        run: docker compose -f services/${{ matrix.stack }}/docker-compose.yaml config -q
+
+  komodo-config:
+    name: komodo.toml
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python3 scripts/check_config.py
+
+  caddyfile:
+    name: Caddyfile
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # The Caddyfile uses the dynamic_dns and duckdns plugins, so it can only
+      # be validated against the custom build, not the stock caddy image.
+      - name: Build custom Caddy image
+        run: docker build -t caddy-ci services/caddy/caddy-build
+
+      - name: Validate Caddyfile
+        run: |
+          docker run --rm \
+            -v "$PWD/services/caddy/config/Caddyfile:/etc/caddy/Caddyfile:ro" \
+            -e ACME_EMAIL=ci@example.invalid \
+            -e PORT_CADDY_ADMIN=2019 \
+            -e DUCKDNS_SUBDOMAIN=ci \
+            -e DUCKDNS_ZONE=duckdns.org \
+            -e DUCKDNS_TOKEN=ci \
+            -e CADDY_HOST_ALIAS=csery-nas \
+            -e PORT_HEIMDALL_HTTP=10080 \
+            -e PORT_BESZEL_HTTP=8090 \
+            -e PORT_NEXTCLOUD_HTTP=8082 \
+            -e PORT_SONARR_HTTP=8989 \
+            -e PORT_QBITTORRENT_HTTP=8080 \
+            -e PORT_RADARR_HTTP=7878 \
+            -e PORT_KOMODO_HTTP=9120 \
+            -e PORT_IMMICH_HTTP=2283 \
+            caddy-ci caddy validate --config /etc/caddy/Caddyfile --adapter caddyfile

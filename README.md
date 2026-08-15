@@ -56,6 +56,13 @@ Do not manually run `docker compose up` on the target host for managed stacks.
 
 Caddy config changes under `services/caddy/config/` require a Caddy redeploy.
 
+## Checks
+
+GitHub Actions validates every push to `main` before the Resource Sync picks it
+up: each Compose file resolves, `komodo.toml` parses and has a source behind
+every `[[placeholder]]`, and the Caddyfile is validated against the custom Caddy
+build. Run the config half locally with `python3 scripts/check_config.py`.
+
 ## Storage
 
 - App state usually lives under `${CONFIG_DIR}/<stack>/...`

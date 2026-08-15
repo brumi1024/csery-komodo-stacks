@@ -43,10 +43,14 @@ services:
       PUID: ${PUID:-1000}
       PGID: ${PGID:-1000}
       TZ: ${TZ:-Europe/Budapest}
+      # qBittorrent announces the port it listens on, so the container port has
+      # to match the published one or peers cannot reach us. The image only
+      # rewrites its config when this variable is set.
+      TORRENTING_PORT: ${PORT_QBITTORRENT_TORRENTING:-57305}
     ports:
       - ${PORT_QBITTORRENT_HTTP:-8080}:8080
-      - ${PORT_QBITTORRENT_TORRENTING:-57305}:6881
-      - ${PORT_QBITTORRENT_TORRENTING:-57305}:6881/udp
+      - ${PORT_QBITTORRENT_TORRENTING:-57305}:${PORT_QBITTORRENT_TORRENTING:-57305}
+      - ${PORT_QBITTORRENT_TORRENTING:-57305}:${PORT_QBITTORRENT_TORRENTING:-57305}/udp
     volumes:
       - ${CONFIG_DIR:-/docker}/qbittorrent/config:/config
       - /media/downloads:/data/downloads
