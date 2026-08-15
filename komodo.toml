@@ -20,6 +20,9 @@ auto_update = true
 linked_repo = "csery-komodo-stacks"
 run_directory = "services/caddy"
 file_paths = ["docker-compose.yaml"]
+# This stack builds Caddy from services/caddy/caddy-build. Without run_build,
+# a deploy reuses the cached image and CADDY_VERSION bumps are silently ignored.
+run_build = true
 config_files = [
   { path = "config/Caddyfile", requires = "Redeploy" }
 ]
